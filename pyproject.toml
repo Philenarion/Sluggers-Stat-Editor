@@ -1,0 +1,12 @@
+[project]
+name = "sluggers-stat-editor"
+version = "0.1.0"
+description = "Mario Super Sluggers Stat and chemistry editor"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.18.0",
+]
