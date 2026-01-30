@@ -1,2 +1,27 @@
 build
 dist
+*.exe
+*.zip
+
+tmp
+
+# PyInstaller
+*.spec
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
