@@ -44,11 +44,10 @@ jobs:
 
       - name: Create zip archive
         run: |
-          $compress = @{
-            Path = "dist\*"
-            DestinationPath = "sluggers-stat-editor-${{ steps.release_info.outputs.release_name }}.zip"
-          }
-          Compress-Archive @compress
+          $folderName = "sluggers-stat-editor-${{ steps.release_info.outputs.release_name }}"
+          New-Item -ItemType Directory -Path $folderName
+          Copy-Item -Path "dist\*" -Destination $folderName -Recurse
+          Compress-Archive -Path $folderName -DestinationPath "$folderName.zip"
         shell: pwsh
 
       - name: Prepare release notes
