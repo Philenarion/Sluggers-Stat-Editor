@@ -2628,18 +2628,26 @@ def loadCode():
             size=int(codes[0][0])
             amount=int(codes[0][1:4],16)+1
             skip=int(codes[0][4:],16)
-            increment=int(codes[1])
+            increment=int(codes[1],16)
             for i in range(amount):
                 if size==0:
-                    simpleCodeLoad(address+skip*i,codeStock+increment*i)
+                    simpleCodeLoad(address+skip*i,(codeStock+increment*i)%256)
                 elif size==1:
-                    simpleCodeLoad(address+skip*i,codeStock+increment*i)
-                    simpleCodeLoad(address+skip*i+1,codeStock+increment*i)
+                    code1=codeStock//256
+                    code2=codeStock%256
+                    simpleCodeLoad(address+skip*i,code1)
+                    simpleCodeLoad(address+skip*i+1,code2)
+                    codeStock=(codeStock+increment)%65536
                 else:
-                    simpleCodeLoad(address+skip*i,codeStock+increment*i)
-                    simpleCodeLoad(address+skip*i+1,codeStock+increment*i)
-                    simpleCodeLoad(address+skip*i+2,codeStock+increment*i)
-                    simpleCodeLoad(address+skip*i+3,codeStock+increment*i)
+                    code1=codeStock//16777216
+                    code2=(codeStock%16777216)//65536
+                    code3=(codeStock%65536)//256
+                    code4=codeStock%256
+                    simpleCodeLoad(address+skip*i,code1)
+                    simpleCodeLoad(address+skip*i+1,code2)
+                    simpleCodeLoad(address+skip*i+2,code3)
+                    simpleCodeLoad(address+skip*i+3,code4)
+                    codeStock=(codeStock+increment)%4294967296
             is08=0
         else:
             handle=codes[0][:2]
@@ -2648,7 +2656,7 @@ def loadCode():
                 for i in range(int(codes[1][:4],16)+1):
                     simpleCodeLoad(address+i,int(codes[1][6:],16))
             elif handle=="02":
-                for i in range(int(codes[1][:4]),16):
+                for i in range(int(codes[1][:4],16)+1):
                     simpleCodeLoad(address+2*i,int(codes[1][4:6],16))
                     simpleCodeLoad(address+2*i+1,int(codes[1][6:],16))
             elif handle=="04":
@@ -2733,7 +2741,7 @@ def devMode():
         recapList.insert(tk.END, "Dev mode de-activated, edited stats may remain out of safe range\n")
         recapList.configure(state="disabled")
 
-            
+
 #main loop
 root = tk.Tk()
 root.geometry("1200x720")
@@ -3485,7 +3493,7 @@ credits3 = tk.Label(creditsFrame, text="lonelyVoxel, for their work on firebro w
 credits3.pack(pady=10)
 credits4 = tk.Label(creditsFrame, text="Fun Guy, for their many discoveries diving into the code", font=('Arial',12))
 credits4.pack(pady=10)
-credits5 = tk.Label(creditsFrame, text="harrhy, for teaching me how to create the executable", font=('Arial',12))
+credits5 = tk.Label(creditsFrame, text="harrhy, for all their help with the github and the executable", font=('Arial',12))
 credits5.pack(pady=10)
 credits6 = tk.Label(creditsFrame, text="Knockoff, Kircher, C², Zpocalypse, JK41 and others for testing and various findings", font=('Arial',11))
 credits6.pack(pady=10)

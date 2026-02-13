@@ -2,8 +2,11 @@ Sluggers Stat Editor - How To Use
 ==================================
 
 1. Run the "sluggers-stat-editor" application.
-2. Open a save file using File > Open.
-3. Edit player stats as desired.
-4. Save your changes.
+(2. Optional : Import a gecko code or save file in the "gecko code" tab)
+3. Edit chemistry and stats in the first 4 tabs.
+4. Generate the code in the "gecko code" tab.
+5. Visit "Credits" tab to know who to thank for this program :)
 
 For more information, see the README or visit the project repository.
+
+The source code can also be found and run in the "Source Code" folder
