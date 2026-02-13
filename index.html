@@ -88,6 +88,25 @@
             gap: 1rem;
         }
 
+        .release-notes {
+            background-color: #f0f4ff;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            border-left: 4px solid #2a529b;
+        }
+
+        .release-notes h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #2a529b;
+        }
+
+        .release-notes p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #333;
+        }
+
         ul {
             padding-left: 1.5rem;
         }
@@ -115,6 +134,11 @@
                 <a href="https://github.com/Philenarion/Sluggers-Stat-Editor/releases" class="releases-link">View all
                     releases</a>
             </p>
+        </div>
+
+        <div class="release-notes">
+            <h2>What's New in {{RELEASE_NAME}}</h2>
+            <p>{{RELEASE_NOTES}}</p>
         </div>
     </div>
 </body>
