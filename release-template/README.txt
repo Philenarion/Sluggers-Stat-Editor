@@ -41,7 +41,7 @@ enter the file name and press "Load gecko code". Note that it can only read geck
 
 Wacky stuff tab:
 Dev mode allows you to input any number in the double-byte stats.
-Reverse buttons reverse the stats according to the current stats (so it will also reverse any change you made).
+Reverse buttons reverses the stats according to the current stats (so it will also reverse any change you made).
 For reverse stats, it will reverse around the midpoint between the max and min of that stat in vanilla, big outliers excluded)
 
 Credits tab:
