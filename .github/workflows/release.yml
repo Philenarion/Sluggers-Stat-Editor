@@ -12,7 +12,44 @@ permissions:
   id-token: write
 
 jobs:
+  check-release:
+    runs-on: ubuntu-latest
+    outputs:
+      is_release: ${{ steps.check.outputs.is_release }}
+      version: ${{ steps.check.outputs.version }}
+      release_notes: ${{ steps.check.outputs.release_notes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if commit is a version release
+        id: check
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1)
+
+          # Case-insensitive match for "version X.XX" or "version X.X.X" etc.
+          if echo "$FIRST_LINE" | grep -iqE '^version\s+[0-9]+\.[0-9]+'; then
+            # Extract version number
+            VERSION=$(echo "$FIRST_LINE" | grep -ioE '[0-9]+\.[0-9]+[0-9.]*')
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+            # Extract release notes (everything after the first line)
+            NOTES=$(echo "$COMMIT_MSG" | tail -n +2 | sed '/./,$!d')
+            echo "release_notes<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$NOTES" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+
+            echo "Detected release: v$VERSION"
+            echo "Release notes: $NOTES"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "Not a version commit, skipping release."
+          fi
+
   build-and-release:
+    needs: check-release
+    if: needs.check-release.outputs.is_release == 'true'
     runs-on: windows-latest
 
     steps:
@@ -27,61 +64,42 @@ jobs:
         run: .\build.bat
         shell: cmd
 
-      - name: Generate timestamp and short hash
-        id: release_info
-        run: |
-          $date = Get-Date -Format "yyyy-MM-dd"
-          $hash = git rev-parse --short HEAD
-          $release_name = "$date-$hash"
-          $commit_msg = git log -1 --pretty=%B
-          echo "release_name=$release_name" >> $env:GITHUB_OUTPUT
-          # Use a delimiter for multiline content
-          echo "commit_msg<<EOF" >> $env:GITHUB_OUTPUT
-          echo "$commit_msg" >> $env:GITHUB_OUTPUT
-          echo "EOF" >> $env:GITHUB_OUTPUT
-          echo "Release name: $release_name"
-        shell: pwsh
-
       - name: Create zip archive
         run: |
-          $folderName = "sluggers-stat-editor-${{ steps.release_info.outputs.release_name }}"
+          $version = "${{ needs.check-release.outputs.version }}"
+          $folderName = "sluggers-stat-editor-v$version"
           New-Item -ItemType Directory -Path $folderName
           Copy-Item -Path "dist\*" -Destination $folderName -Recurse
           Compress-Archive -Path $folderName -DestinationPath "$folderName.zip"
         shell: pwsh
 
-      - name: Prepare release notes
-        id: notes
-        run: |
-          $readme = Get-Content README.md -Raw
-          $body = "$readme`n`n---`n`n${{ steps.release_info.outputs.commit_msg }}"
-          echo "body<<EOF" >> $env:GITHUB_OUTPUT
-          echo "$body" >> $env:GITHUB_OUTPUT
-          echo "EOF" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.release_info.outputs.release_name }}
-          name: ${{ steps.release_info.outputs.release_name }}
-          body: ${{ steps.notes.outputs.body }}
-          files: sluggers-stat-editor-${{ steps.release_info.outputs.release_name }}.zip
+          tag_name: v${{ needs.check-release.outputs.version }}
+          name: Sluggers Stat Editor v${{ needs.check-release.outputs.version }}
+          body: ${{ needs.check-release.outputs.release_notes }}
+          files: sluggers-stat-editor-v${{ needs.check-release.outputs.version }}.zip
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate index.html for GitHub Pages
+        env:
+          RELEASE_NOTES: ${{ needs.check-release.outputs.release_notes }}
         run: |
           $template = Get-Content index.html -Raw
-          $release_name = "${{ steps.release_info.outputs.release_name }}"
-          $download_url = "https://github.com/Philenarion/Sluggers-Stat-Editor/releases/download/$release_name/sluggers-stat-editor-$release_name.zip"
+          $version = "${{ needs.check-release.outputs.version }}"
+          $release_name = "v$version"
+          $release_notes = $env:RELEASE_NOTES
+          $download_url = "https://github.com/Philenarion/Sluggers-Stat-Editor/releases/download/v$version/sluggers-stat-editor-v$version.zip"
           $html = $template -replace '{{RELEASE_NAME}}', $release_name
           $html = $html -replace '{{DOWNLOAD_URL}}', $download_url
-          mkdir -p _pages
+          $html = $html -replace '{{RELEASE_NOTES}}', $release_notes.Trim()
+          New-Item -ItemType Directory -Path _pages -Force
           Set-Content -Path _pages/index.html -Value $html
-          Write-Host "Generated index.html with release: $release_name"
+          Write-Host "Generated index.html for release: $release_name"
         shell: pwsh
 
       - name: Deploy to GitHub Pages
