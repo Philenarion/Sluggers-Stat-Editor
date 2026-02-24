@@ -1942,6 +1942,7 @@ def changedTrajListUsed():
         if trajUsed[i]:
             trajList.append(trajAllList[i])
     sbStat26.config(values=trajList)
+    trajGroup.config(values=trajAllList)
     statDisplay(1)
     
 def activateGroup():
