@@ -3511,6 +3511,7 @@ def loadCode():
                 l=line.rstrip("\n")
                 if not re.search("^[0-9a-fA-F]{8}\s[0-9a-fA-F]{8}$",l):
                     recapList.insert(tk.END,"unexpected gecko code (each line must be xxxxxxxx xxxxxxxx)\n")
+                    recapList.insert(tk.END,l+"\n")
                     recapList.configure(state="disabled")
                     return
                 code.append(line)
@@ -3598,6 +3599,130 @@ def loadCode():
     chemColor()
     recapList.insert(tk.END,"Gecko code loaded\n")
     recapList.configure(state="disabled")
+
+def patchMaker():
+    recapList.configure(state="normal")
+    name=geckoPatchFile.get()
+    if not name.isalnum():
+        if name=="":
+            recapList.insert(tk.END,"No file name\n")
+            recapList.configure(state="disabled")
+            return
+        recapList.insert(tk.END,"File name can't contain spaces or special characters\n")
+        recapList.configure(state="disabled")
+        return
+    if geckoPatchSecurityVar.get()==1:
+        mode="w"
+    else:
+        mode="x"
+    path=abspath(getsourcefile(lambda:0)).rsplit("\\",2)[0]
+    try:
+        with open(path+"\\Gecko Codes\\"+name+".txt",mode) as file:
+            file.write("Patch Notes\n")
+            changes=[]
+            first=0
+            for i in range(101):
+                for j in range(101):
+                    if changedChem[i][j]!=defaultChem[i][j]:
+                        changes.append([charList[j],changedChem[i][j]])
+                if len(changes)>0:
+                    if first==0:
+                        file.write("\nChem Changes\n\n")
+                        first=1
+                    for l in changes:
+                        file.write(charList[i] + [" anti-chem "," no chem "," chem "][l[1]] + l[0]+"\n")
+                    changes=[]
+            first=0
+            for i in range(101):
+                for j in range(30):
+                    if changedStat[i][j]!=defaultStat[i][j]:
+                        changes.append([defaultStat[i][j],changedStat[i][j],statsList[j]])
+                for j in range(14):
+                    if changedSize[i][j]!=defaultSize[i][j]:
+                        changes.append([defaultSize[i][j],changedSize[i][j],"hitbox "+sizeList[j]])
+                for j in range(5):
+                    if changedPitching[i][j]!=defaultPitching[i][j]:
+                        changes.append([defaultPitching[i][j],changedPitching[i][j],"pitching "+pitchingList[j]])
+                if len(changes)!=0:
+                    if first==0:
+                        file.write("\nStat Changes\n\n")
+                        first=1
+                    file.write(charList[i]+" :\n")
+                    for l in changes:
+                        file.write("   "+l[2]+" : "+str(l[0])+" --> "+str(l[1])+"\n")
+                    changes=[]
+            change=0
+            for i in range(24):
+                for j in range(25):
+                    if changedTraj[i][j]!=defaultTraj[i][j]:
+                        change=1
+                    if (i%4==3 and j==25):
+                        if change==1:
+                            changes.append(i//3)
+                            change=0
+            if len(changes)!=0:
+                file.write("\nTraj Changes\n\n")
+            for t in changes:
+                file.write(trajAllList[t]+"\n")
+            changes=[]
+            first=0
+            for i in range(43):
+                for j in range(2):
+                    if changedSpeed[i][j]!=defaultSpeed[i][j]:
+                        changes.append([defaultSpeed[i][j],changedSpeed[i][j],speedList[j]])
+                if len(changes)!=0:
+                    if first==0:
+                        file.write("\nSpeeds Changes\n\n")
+                        first=1
+                    file.write(str(i*10)+" :\n")
+                    for l in changes:
+                        file.write("   "+l[2]+" : "+str(l[0])+" --> "+str(l[1])+"\n")
+                    changes=[]
+            first=0
+            for i in range(12):
+                for j in range(41):
+                    if changedStarsTeam[i][j]!=defaultStarsTeam[i][j]:
+                        changes.append([defaultStarsTeam[i][j],changedStarsTeam[i][j],starEventsList[j]])
+                if len(changes)!=0:
+                    if first==0:
+                        file.write("\nStar Gain Changes\n\n")
+                        first=1
+                    file.write(teamList[i]+" :\n")
+                    for l in changes:
+                        file.write("   "+l[2]+" : "+str(l[0])+" --> "+str(l[1])+"\n")
+                    changes=[]
+            first=0
+            for i in range(4):
+                for j in range(2):
+                    if changedStarHandicap[i][j]!=defaultStarHandicap[i][j]:
+                        changes.append([defaultStarHandicap[i][j],changedStarHandicap[i][j],["Lead By","Multiply By"][j]])
+                if len(changes)!=0:
+                    if first==0:
+                        file.write("\nStar Gain Handicap Changes\n\n")
+                        first=1
+                    file.write(["1st","2nd","3rd","4th"][i]+" :\n")
+                    for l in changes:
+                        file.write("   "+l[2]+" : "+str(l[0])+" --> "+str(l[1])+"\n")
+                    changes=[]
+            first=0
+            for i in range(16):
+                for j in range(4):
+                    if changedStarBoost[i][j]!=defaultStarBoost[i][j]:
+                        changes.append([defaultStarBoost[i][j],changedStarBoost[i][j],starBoostList[j]])
+                if len(changes)!=0:
+                    if first==0:
+                        file.write("\nStar Boost Changes\n\n")
+                        first=1
+                    file.write(starBoostStatsList[i]+" :\n")
+                    for l in changes:
+                        file.write("   "+l[2]+" : "+str(l[0])+" --> "+str(l[1])+"\n")
+                    changes=[]
+            recapList.insert(tk.END,"Patch Notes Generated\n\n")
+            recapList.configure(state="disabled")
+    except FileExistsError:
+        recapList.insert(tk.END,"File already exists\n")
+        recapList.configure(state="disabled")
+        return
 
 #Wacky functions
 
@@ -5060,6 +5185,16 @@ geckoCodeFile.pack(padx=5)
 geckoCodeFile.insert("0","Gecko Code File Name")
 geckoCodeLoad = tk.Button(geckoCodeLoaderFrame, text="Load gecko code", width=15, command=loadCode)
 geckoCodeLoad.pack(padx=5,pady=5)
+
+geckoPatchNoteFrame = tk.LabelFrame(geckoFrame, text="Patch Note Maker")
+geckoPatchNoteFrame.grid(row=5, column=0, columnspan=4)
+geckoPatchFile = tk.Entry(geckoPatchNoteFrame, width=80)
+geckoPatchFile.pack(padx=5)
+geckoPatchButton = tk.Button(geckoPatchNoteFrame, text="Generate Patch Note (in the Gecko Codes Folder)", width=37, command=patchMaker)
+geckoPatchButton.pack(side=tk.LEFT,padx=5,pady=5)
+geckoPatchSecurityVar = tk.IntVar()
+geckoPatchSecurity = tk.Checkbutton(geckoPatchNoteFrame, text="Override savefile", variable=geckoPatchSecurityVar)
+geckoPatchSecurity.pack(side=tk.LEFT)
 
 #Wacky Stuff
 

@@ -12,6 +12,7 @@ Added in version 3.4 : added a gecko code loader, that reads chem and stats chan
 Added in version 3.5 : fix to the gecko loader, executable now available !
 
 Added in version 4.0 : added change up, pitching wind up, hitboxes, real speeds, star gains and star boosts
+Added in version 4.1 : added a patch note generator
 
 
 Either run the sluggers-stat-editor.exe, or you can find the source code in the "Source Code" folder
@@ -44,6 +45,7 @@ You can also choose to only generate the code for some characters, while making 
 You can save and load the changes made, stored in a .txt file in the "Save Files" folder.
 You can also load changes made from a gecko code directly, simply put the gecko code in a .txt file in the "Gecko Codes" folder,
 enter the file name and press "Load gecko code". Note that it can only read gecko commands starting with 00,02,04,06 or 08.
+You can also generate the patch notes automatically. File is generated in the "Gecko Codes" folder.
 
 Wacky Stuff tab:
 Dev mode allows you to input any number in the double-byte stats.
