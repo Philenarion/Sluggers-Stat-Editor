@@ -4,6 +4,7 @@ dist
 *.zip
 
 tmp
+Bridge/
 
 # PyInstaller
 *.spec

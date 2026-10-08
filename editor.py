@@ -898,7 +898,7 @@ def currentChem():
     if start!=-1:
         chemRecap.insert(tk.END,start.lstrip()+" has chem with:\n")
         nlines=nlines+1
-        for i in range(101):
+        for i in range(len(charList)):
             chem=-1
             for j in range(startIndex,startIndex+startGroupSize):
                 player=charList.index(comboList[j].lstrip())
@@ -920,7 +920,7 @@ def currentChem():
     if end!=-1:
         chemRecap.insert(tk.END,end.lstrip()+" has chem with:\n")
         nlines=nlines+1
-        for i in range(101):
+        for i in range(len(charList)):
             chem=-1
             for j in range(endIndex,endIndex+endGroupSize):
                 player=charList.index(comboList[j].lstrip())
@@ -992,7 +992,7 @@ def chemColor(*args):
     
 def simpleChemChange(start,end,chem,direction):
     changedChem[start][end]=chem
-    if direction==2:
+    if direction==2 or (bridgeMode and bridgeMode.symmetric(start,end)):
         changedChem[end][start]=chem
     
 def changeChem():
@@ -1068,7 +1068,7 @@ def globalChemEE():
     n=77
     message=" (except miis) "
     if miis:
-        n=101
+        n=len(charList)
         message=" "
     L0=[]
     for i in range(n):
@@ -1076,7 +1076,7 @@ def globalChemEE():
     for i in range(n):
         L=L0.copy()
         if not miis:
-            for j in range(77,101):
+            for j in range(77,len(charList)):
                 L.append(changedChem[i][j])
         changedChem[i]=L.copy()
     if choice==2:
@@ -1115,7 +1115,7 @@ def globalChemCE():
     n=77
     message=" (except miis) "
     if miis:
-        n=101
+        n=len(charList)
         message=" "    
     for i in range(startIndex,startIndex+startGroupSize):
         istartIndex=charList.index(comboList[i].lstrip())
@@ -1162,7 +1162,7 @@ def globalChemEC():
     n=77
     message=" (except miis) "
     if miis:
-        n=101
+        n=len(charList)
         message=" "    
     for i in range(startIndex,startIndex+startGroupSize):
         istartIndex=charList.index(comboList[i].lstrip())
@@ -1183,7 +1183,7 @@ def globalChemEC():
     recapList.configure(state="disabled")
     
 def autoChem():
-    for i in range(101):
+    for i in range(len(charList)):
         changedChem[i][i]=2
     recapList.configure(state="normal")
     recapList.insert(tk.END,"Everyone chem with themselves\n")
@@ -1861,7 +1861,7 @@ def changeStatsE():
                 message=message+" "+statsList[i]+","
             else:
                 message=message+" "+pitchingList[i-30]+","
-            for j in range(101):
+            for j in range(len(charList)):
                 if i<30:
                     changedStat[j][i]=stat
                 else:
@@ -1946,7 +1946,7 @@ def resetStatsE():
                 message=message+" "+statsList[i]+","
             else:
                 message=message+" "+pitchingList[i-30]+","
-            for j in range(101):
+            for j in range(len(charList)):
                 if i<30:
                     changedStat[j][i]=defaultStat[j][i]
                 else:
@@ -2141,9 +2141,7 @@ def randomizeStats():
     recapList.configure(state="normal")
     playerList=randPlayerList.copy()
     if randStatEveryPlayerVar.get():
-        playerList=list(range(124))
-        for i in [10,18,27,30,33,39,46,53,57,64,75,82,85,88,91,94,97,100,103,106,109,112,115]:
-            playerList.remove(i)      
+        playerList=[i for i in range(len(comboList)) if getGroupSize(i)==1]
     nPlayers=len(playerList)
     if nPlayers==0:
         recapList.insert(tk.END,"No characters to randomize\n")
@@ -2473,7 +2471,7 @@ def activateGroup():
     changedTrajListUsed()
     message="Warning :"
     if trajGroupActiveVar.get()==0:
-        for i in range(101):
+        for i in range(len(charList)):
             if changedStat[i][26]==index:
                 message=message+" "+charList[i]+","
     if message!="Warning :":
@@ -3722,8 +3720,8 @@ def patchMaker():
             file.write("Patch Notes\n")
             changes=[]
             first=0
-            for i in range(101):
-                for j in range(101):
+            for i in range(len(charList)):
+                for j in range(len(charList)):
                     if changedChem[i][j]!=defaultChem[i][j]:
                         changes.append([charList[j],changedChem[i][j]])
                 if len(changes)>0:
@@ -3734,7 +3732,7 @@ def patchMaker():
                         file.write(charList[i] + [" anti-chem "," no chem "," chem "][l[1]] + l[0]+"\n")
                     changes=[]
             first=0
-            for i in range(101):
+            for i in range(len(charList)):
                 for j in range(30):
                     if changedStat[i][j]!=defaultStat[i][j]:
                         changes.append([defaultStat[i][j],changedStat[i][j],statsList[j]])
@@ -3833,7 +3831,7 @@ def fixWalu():
 def reverseStats():
     L=[0,0,3,0,4,0,0,0,0,0,125,90,75,110,100,100,110,105,10,10,10,10,220,255,95,0,0,0,120]
     for j in [2,4,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,26,28]:
-        for i in range(101):
+        for i in range(len(charList)):
             s=changedStat[i][j]
             if j==26:
                 t=(3-s)%3
@@ -3847,8 +3845,8 @@ def reverseStats():
     recapList.configure(state="disabled")
 
 def reverseChem():
-    for i in range(101):
-        for j in range(101):
+    for i in range(len(charList)):
+        for j in range(len(charList)):
             changedChem[i][j]=(2-changedChem[i][j])%3
     chemColor()
     recapList.configure(state="normal")
@@ -3856,7 +3854,7 @@ def reverseChem():
     recapList.configure(state="disabled")
     
 def reverseHand():
-    for i in range(101):
+    for i in range(len(charList)):
         changedStat[i][0]=1-changedStat[i][0]
         changedStat[i][1]=1-changedStat[i][1]
     statDisplay(0)
@@ -4020,7 +4018,7 @@ def changeHitboxE():
                 recapList.configure(state="disabled")
                 return
             message=message+" "+sizeList[i]+","
-            for j in range(101):
+            for j in range(len(charList)):
                 changedSize[j][i]=float(stat)
     if message!="":
         message=message.rstrip(",")
@@ -4087,7 +4085,7 @@ def resetHitboxE():
     for i in range(14):
         if eval("checkHitbox"+str(i)).getvar(eval("checkHitbox"+str(i)).cget("variable"))=="1":
             message=message+" "+sizeList[i]+","
-            for j in range(101):
+            for j in range(len(charList)):
                 changedSize[j][i]=defaultSize[j][i]
     if message!="":
         message=message.rstrip(",")
@@ -4163,7 +4161,7 @@ def randomizeHitboxesE():
     linkScale=hitboxRandLinkScaleVar.get()
     for i in range(14):
         if eval("checkHitbox"+str(i)).getvar(eval("checkHitbox"+str(i)).cget("variable"))=="1" and not (i==1 and linkScale):
-            for j in range(101):
+            for j in range(len(charList)):
                 if i<2:
                    mini=float(eval("hitboxRandMin"+str(i)).get())
                    maxi=float(eval("hitboxRandMax"+str(i)).get())
@@ -4584,6 +4582,13 @@ def resetStarBoostA():
     recapList.configure(state="normal")
     recapList.insert(tk.END,"All star boosts reset\n")
     recapList.configure(state="disabled")
+
+#Sluggies Tools Bridge Mode: without Bridge/stat_bridge.json nothing changes
+try:
+    import sluggies_bridge
+except ImportError:
+    sluggies_bridge = None
+bridgeMode = sluggies_bridge.load(globals(), abspath(getsourcefile(lambda:0))) if sluggies_bridge else None
 
 #main loop
 root = tk.Tk()
@@ -6437,4 +6442,6 @@ root.title("Sluggers stats editor v4")
 root.lift()
 root.attributes('-topmost', True)
 root.attributes('-topmost', False)
+if sluggies_bridge:
+    sluggies_bridge.finish(globals())
 root.mainloop()

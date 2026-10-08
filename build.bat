@@ -16,9 +16,11 @@ xcopy /s /y release-template\* dist\
 rem Create empty save and load folders
 mkdir "dist\Gecko Codes" 2>nul
 mkdir "dist\Save Files" 2>nul
+mkdir "dist\Bridge" 2>nul
 
 rem Copy source code into dist\Source-Code\
 mkdir dist\Source-Code 2>nul
 copy /y editor.py dist\Source-Code\
+copy /y sluggies_bridge.py dist\Source-Code\
 
 echo Build complete: dist\sluggers-stat-editor.exe
