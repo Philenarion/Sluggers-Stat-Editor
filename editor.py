@@ -6430,12 +6430,14 @@ credits4 = tk.Label(creditsFrame, text="lonelyVoxel, for their work on firebro w
 credits4.pack(pady=10)
 credits5 = tk.Label(creditsFrame, text="harrhy, for all their help with the github and the executable", font=('Arial',12))
 credits5.pack(pady=10)
-credits6 = tk.Label(creditsFrame, text="Knockoff, Kircher, C², Zpocalypse, JK41 and others for testing and various findings", font=('Arial',11))
+credits6 = tk.Label(creditsFrame, text="JawSFM, for making the bridge to connect to Sluggies Tools", font=('Arial',12))
 credits6.pack(pady=10)
-credits7 = tk.Label(creditsFrame, text="Becket, for their gathering of knowledge and help finding it", font=('Arial',11))
+credits7 = tk.Label(creditsFrame, text="Knockoff, Kircher, C², Zpocalypse, JK41 and others for testing and various findings", font=('Arial',11))
 credits7.pack(pady=10)
-credits8 = tk.Label(creditsFrame, text="Everyone else I'm forgetting :)")
+credits8 = tk.Label(creditsFrame, text="Becket, for their gathering of knowledge and help finding it", font=('Arial',11))
 credits8.pack(pady=10)
+credits9 = tk.Label(creditsFrame, text="Everyone else I'm forgetting :)")
+credits9.pack(pady=10)
 
 
 root.title("Sluggers stats editor v4")
